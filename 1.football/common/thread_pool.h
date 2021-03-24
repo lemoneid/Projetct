@@ -12,7 +12,7 @@
 #define MAXXTHREAD 10
 struct task_queue {
     int sum;
-    int epllfd;
+    int epollfd;
     int head;
     int tail;
     struct User **team;
