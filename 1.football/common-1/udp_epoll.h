@@ -1,8 +1,8 @@
 /*************************************************************************
 	> File Name: udp_epoll.h
-	> Author: yanzhiwei
-	> Mail: 1931248856@qq.com 
-	> Created Time: Wed Mar 24 09:01:17 2021
+	> Author: wei 
+	> Mail: 1931248856@qq.com
+	> Created Time: 2020年10月21日 星期三 19时15分10秒
  ************************************************************************/
 
 #ifndef _UDP_EPOLL_H
@@ -13,4 +13,5 @@ void del_event(int epollfd, int fd);
 int udp_accept(int fd, struct User *user);
 void add_to_sub_reactor(struct User *user);
 int check_online(struct LogRequest *request);
+
 #endif

@@ -15,7 +15,7 @@
 //
 #include <ncurses.h>
 #include <locale.h>
-//#include "cJSON.h"
+#include "cJSON.h"
 
 //system
 #include <math.h>
@@ -49,6 +49,9 @@
 #include <semaphore.h>
 #include <sys/select.h>
 #include <sys/time.h>
+
+
+
 
 #ifdef _D
 #define DBG(fmt, args...); printf(fmt, ##args);

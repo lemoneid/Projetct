@@ -1,8 +1,8 @@
 /*************************************************************************
 	> File Name: datatype.h
-	> Author: yanzhiwei
-	> Mail: 1931248856@qq.com 
-	> Created Time: Tue Mar 23 16:17:08 2021
+	> Author: wei 
+	> Mail: 1931248856@qq.com
+	> Created Time: 2020年10月21日 星期三 19时09分58秒
  ************************************************************************/
 
 #ifndef _DATATYPE_H
@@ -92,5 +92,4 @@ struct FootBallMsg {
     char msg[MAX_MSG];
     struct Ctl ctl;
 };
-
 #endif

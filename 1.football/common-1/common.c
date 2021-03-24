@@ -15,7 +15,7 @@ int socket_udp() {
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         return -1;
     }
-    //make_non_block(sockfd);
+    make_non_block(sockfd);
     return sockfd;
 }
 
@@ -35,7 +35,7 @@ int socket_create_udp(int port) {
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int)) < 0) {
         return -1;
     }
-    //make_non_block(sockfd);
+    make_non_block(sockfd);
 
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
         return -1;

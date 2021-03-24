@@ -1,19 +1,15 @@
 /*************************************************************************
 	> File Name: game_ui.c
-	> Author: yanzhiwei
-	> Mail: 1931248856@qq.com 
-	> Created Time: Tue Mar 23 16:13:30 2021
+	> Author: wei 
+	> Mail: 1931248856@qq.com
+	> Created Time: 2020年10月30日 星期五 18时20分59秒
  ************************************************************************/
-
-#include <stdio.h>
 #include "head.h"
 #include <ncurses.h>
 extern struct Map court;//球场大小，你应该在server.c和client.c中定义该变量，并初始化
 extern WINDOW *Football, *Football_t, *Message, *Help, *Score, *Write;//窗体
 extern struct Bpoint ball;  //球的位置
 extern struct BallStatus ball_status;
-int message_num = 0;
-
 WINDOW *create_newwin(int width, int height, int startx, int starty) {
     WINDOW *win;
     win = newwin(height, width, starty, startx);
@@ -84,58 +80,4 @@ void initfootball() {
     wattron(Football, COLOR_PAIR(6));
     w_gotoxy_putc(Football, ball.x, ball.y, 'o');
     return ;
-}
-
-
-void init_help() {
-	w_gotoxy_puts(Help, 1, 1, "wasd - 控制上下左右");
-	w_gotoxy_puts(Help, 1, 2, "  j  - 停球");
-	w_gotoxy_puts(Help, 1, 3, "  k  - 踢球");
-	w_gotoxy_puts(Help, 1, 4, "  l  - 带球");
-	w_gotoxy_puts(Help, 1, 5, "空格 - 选择力度");
-}
-
-void *draw(void *arg) {
-    initfootball();
-	init_help();
-    while (1) {
-        sleep(10);
-    }
-    return NULL;
-}
-
-void show_message(WINDOW *win, struct User *user, char *msg, int type) {
-	time_t time_now = time(NULL);
-	struct tm* tm = localtime(&time_now);
-	char timestr[20] = {0};
-	char username[80] = {0};
-	sprintf(timestr, "%02d:%02d:%02d ", tm->tm_hour, tm->tm_min, tm->tm_sec);
-	if (type) { //1系统信息
-		wattron(win, COLOR_PAIR(4));
-		strcpy(username, "Server Info : ");
-	} else {
-		if (user->team) {
-			wattron(win, COLOR_PAIR(6));
-		} else {
-			wattron(win, COLOR_PAIR(2));
-		}
-		sprintf(username, "%s : ", user->name);
-	}
-	if (message_num < 4) {
-		w_gotoxy_puts(win, 10, message_num, username);
-		wattron(win, COLOR_PAIR(3));
-		w_gotoxy_puts(win, 10 + strlen(username), message_num, msg);
-		wattron(win, COLOR_PAIR(5));
-		w_gotoxy_puts(win, 1, message_num, timestr);
-		message_num += 1;
-	} else {
-		message_num = 4;
-		scroll(win);
-		w_gotoxy_puts(win, 10, message_num, username);
-		wattron(win, COLOR_PAIR(3));
-		w_gotoxy_puts(win, 10 + strlen(username), message_num, msg);
-		wattron(win, COLOR_PAIR(5));
-		w_gotoxy_puts(win, 1, message_num, timestr);
-	}
-	wrefresh(win);
 }
