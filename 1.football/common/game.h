@@ -7,7 +7,6 @@
 
 #ifndef _GAME_UI_H
 #define _GAME_UI_H
-#define MAX 50
 #define DEFARG(name, default_value) ((#name[0]) ? (name + 0) : default_value)
 #define Show_Message(arg0, arg1, arg2, arg3) show_message(DEFARG(arg0, Message), DEFARG(arg1, NULL), arg2, DEFARG(arg3, 0))
 WINDOW *create_newwin(int width, int height, int startx, int starty);

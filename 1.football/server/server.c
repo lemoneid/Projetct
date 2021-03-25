@@ -10,6 +10,9 @@
 #include "../common/color.h"
 #include "../common/datatype.h"
 #include "../common/game_ui.h"
+#include "../common/thread_pool.h"
+#include "../common/sub_reactor.c"
+#include "../common/udp_epoll.h"
 
 char *conf = "./server.conf";
 struct User *rteam;
@@ -19,11 +22,11 @@ struct BallStatus ball_status;
 
 int repollfd, bepollfd;
 int data_port;
-//int port = 0;
+int port = 0;
 
 
 int main(int argc, char **argv) {
-    int opt, port = 0, listener;
+    int opt, listener, epoll_fd;
 
     while ((opt = getopt(argc, argv, "p:")) != -1) {
         switch (opt) {
@@ -48,8 +51,8 @@ int main(int argc, char **argv) {
     data_port = atoi(get_value(conf, "DATAPORT"));
     court.width = atoi(get_value(conf, "COLS"));
     court.height = atoi(get_value(conf, "LINES"));
-    court.start.x = 1;
-    court.start.y = 1;
+    court.start.x = 3;
+    court.start.y = 3;
     ball.x = court.width / 2;
 	ball.y = court.height / 2;
 
@@ -64,15 +67,24 @@ int main(int argc, char **argv) {
 
 
     DBG(GREEN"INFO"NONE" : Server start on Port %d\n", port);
-
-    pthread_create(&draw_t, NULL, draw, NULL);
-
+#ifndef _D
+    //pthread_create(&draw_t, NULL, draw, NULL);
+#endif
     epoll_fd = epoll_create(MAX * 2);
+    repollfd = epoll_create(MAX);
+    bepollfd = epoll_create(MAX);
 
-    if (epoll_fd < 0) {
+    if (epoll_fd < 0 || repollfd < 0 || bepollfd < 0) {
         perror("epoll_create");
         exit(1);
     }
+
+    struct task_queue redQueue;
+    struct task_queue blueQueue;
+    task_queue_init(&redQueue, MAX, repollfd);
+    task_queue_init(&blueQueue, MAX, bepollfd);
+    pthread(&red_t, NULL, sub_reactor, (void *)redQueue);
+    Pthread(&blue_t, NULL, sub_reactor, (void *)blueQueue);
 
     struct epoll_event ev, events[MAX * 2];
     ev.events = EPOLLIN;
@@ -88,16 +100,21 @@ int main(int argc, char **argv) {
         DBG(YELLOW"Main Pthread"NONE" : before epoll_wait\n");
         int nfds = epoll_wait(epoll_fd, events, MAX * 2, -1);
         DBG(YELLOW"Main Pthread"NONE" : after epoll_wait\n");
+
+
         for (int i = 0; i < nfds; i++) {
-            char info[1024] = {0};
-            if (events.data.fd == listener) {
+            struct User user;
+            char buff[512] = {0};
+            if (events[i].data.fd == listener) {
+                //accept
+                int new_fd = udp_accept(epoll_fd, listener, &user);
+                if (new_fd > 0) {
+                    DBG(YELLOW"Main Thread"NONE" : Add %s to %s sub_reactor\n", user.name, (user.team ? "BLUE" : "RED"));
+                }
+
             }
         }
-
-        recvfrom(listener, (void *)&lg, sizeof(lg), 0, (struct sockadrr *)&client, &len);
-        mvwprintw(Message, 0, 0, "Login : %s : %d", inet_ntoa(client.sin_addr), client.sin_port);
     }
-
 
     return 0;
 }

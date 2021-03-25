@@ -84,6 +84,7 @@ struct Ctl{
 #define FT_SCORE 0x80 //比分变化
 #define FT_GAMEOVER 0x100 //gameover
 #define MAX_MSG 1024
+#define MAX_USER 50
 struct FootBallMsg {
     int type;
     int size;
