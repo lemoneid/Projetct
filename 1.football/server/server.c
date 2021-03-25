@@ -14,6 +14,7 @@
 #include "../common/sub_reactor.h"
 #include "../common/udp_epoll.h"
 #include "../common/udp_socket.h"
+#include "../common/heart_beat.h"
 
 char *conf = "./football.conf";
 struct User *rteam;
@@ -91,6 +92,7 @@ int main(int argc, char **argv) {
     
     pthread_create(&red_t, NULL, sub_reactor, (void *)&redQueue);
     pthread_create(&blue_t, NULL, sub_reactor, (void *)&blueQueue);
+    pthread_create(&heart_t, NULL, heart_beat, NULL);
 
     struct epoll_event ev, events[MAX_USER * 2];
     ev.events = EPOLLIN;

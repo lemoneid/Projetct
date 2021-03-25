@@ -21,15 +21,15 @@ void do_echo(struct User *user) {
     user->flag = 10;
     if (msg.type & FT_ACK) {
         if (user->team) {
-			DBG(L_BLUE" %s "NONE"心跳\n", user->name);
+			DBG(L_BLUE" %s "NONE"❤\n", user->name);
         } else {
-			DBG(L_RED" %s "NONE"心跳\n", user->name);
+			DBG(L_RED" %s "NONE"❤\n", user->name);
         }
     } else if (msg.type & (FT_WALL | FT_MSG)) {
         if (user->team) {
-			DBG(L_BLUE" %s : %s\n"NONE, user->name, msg.msg);
+            DBG(L_BLUE" MSG :  %s : %s\n"NONE, user->name, msg.msg);
         } else {
-			DBG(L_RED" %s : %s\n"NONE, user->name, msg.msg);
+            DBG(L_RED" MSG : %s : %s\n"NONE, user->name, msg.msg);
         } 
 		strcpy(msg.name, user->name);
 		msg.team = user->team;
