@@ -32,9 +32,7 @@ void add_event_ptr(int epollfd, int fd, int events, struct User *user) {
     DBG(GREEN"Sub Thread"NONE" : After Epoll Add %s.\n", user->name);
 }
 void del_event(int epollfd, int fd) {
-    struct epoll_event ev;
-    ev.data.fd = fd;
-    epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, &ev);
+    epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, NULL);
 
 }
 
@@ -117,7 +115,7 @@ void add_to_sub_reactor(struct User *user) {
 	team[sub] = *user; //把user里的数据拷贝一份到team数组中
 	team[sub].online = 1;
 	team[sub].flag = 10;
-	DBG(L_RED"sub = %d, name = %s"NONE, sub, team[sub].name);
+	DBG(L_RED"sub = %d, name = %s\n"NONE, sub, team[sub].name);
 	if (user->team) {
 		add_event_ptr(bepollfd, team[sub].fd, EPOLLIN | EPOLLET, &team[sub]);
 	} else
