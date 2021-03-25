@@ -9,25 +9,36 @@
 #include "../common/datatype.h"
 #include "../common/udp_socket.h"
 #include "../common/game.h"
+#include "../common/send_info.h"
+#include "../common/show_strength.h"
 
 char server_ip[20] = {0};
 int server_port = 0;
 char *conf = "./football.conf";
-struct Bpoint ball;
-struct Map court;
-WINDOW *Football, *Message, *Help, *Score, *Write, *Football_t;
 int sockfd;
+struct FootBallMsg chat_msg;
+struct FootBallMsg ctl_msg;
+
 void logout(int signum);
 
 int main(int argc, char **argv) {
+    setlocale(LC_ALL, "");
     int opt;
     pthread_t recv_t, draw_t;
+
     struct LogRequest request;
     struct LogResponse response;
     bzero(&request, sizeof(request));
     bzero(&response, sizeof(response));
 
-    while ((opt = getopt(argc, argv, "h:p:")) != -1) {
+    bzero(&chat_msg, sizeof(chat_msg));
+    bzero(&ctl_msg, sizeof(ctl_msg));
+
+    chat_msg.type = FT_MSG;
+    ctl_msg.type = FT_CTL;
+
+
+    while ((opt = getopt(argc, argv, "h:p:n:t:m:")) != -1) {
         switch (opt) {
             case 'h' :
                 strcpy(server_ip, optarg);
@@ -35,15 +46,24 @@ int main(int argc, char **argv) {
             case 'p' :
                 server_port = atoi(optarg);
                 break;
+            case 'n' :
+                strcpy(request.name, optart);
+                break;
+            case 't' :
+                request.team = !!(atoi(optarg));
+                break;
+            case 'm' :
+                strcpy(request.msg, optart);
+                break;
             default :
-                fprintf(stderr, "Usage : %s [-h host] [-p port]\n", argv[0]);
+                fprintf(stderr, "Usage : %s [-h host] [-p port] [-n name] [-t team] [-m msg ]\n", argv[0]);
                 exit(1);
         }
     }
     argc -= (optind - 1);
     argv += (optind - 1);
     if (argc > 1) {
-        fprintf(stderr, "---Usage : %s [-h host] [-p port]!\n", argv[0]);
+                fprintf(stderr, "Usage : %s [-h host] [-p port] [-n name] [-t team] [-m msg ]\n", argv[0]);
         exit(1);
     }
 
@@ -54,10 +74,18 @@ int main(int argc, char **argv) {
     if (!request.team) request.team = atoi(get_conf_value(conf, "TEAM"));
     DBG(GREEN"Name=%s, team=%d, msg=%s, IP=%s, port=%d\n"NONE,request.name, request.team, request.msg ,server_ip, server_port)
 
+    court.width = atoi(get_conf_value(conf, "COLS"));
+    court.height = atoi(get_conf_value(conf, "LINES"));
+    court.start.x = 3;
+    court.start.y = 3;
+
+    signal(SIGINT, logout);
+
     struct sockaddr_in server;
     server.sin_family = AF_INET;
     server.sin_port = htons(server_port);
     server.sin_addr.s_addr = inet_addr(server_ip);
+
     socklen_t len = sizeof(struct sockaddr_in);
 
     DBG(GREEN"INFO"NONE" : server_ip = %s, server_port = %d, name = %s, team = %s logmsg = %s\n", server_ip, server_port, request.name, (request.team ? "BLUE" : "RED"), request.msg);
@@ -89,7 +117,66 @@ int main(int argc, char **argv) {
 			exit(1);
         }
     }
+
+    DBG(GREEN"SERVER : "NONE" %s \n", response.msg);
     connect(sockfd, (struct sockaddr *)&server, len);
+#ifdef _D
+    pthread_create(&draw_t, NULL, draw, NULL);    
+#endif
+    pthread_create(&recv_t, NULL, client_recv, NULL);
+
+    signal(14, send_ctl);
+
+    struct itimerval itimer;
+    itimer.it_interval.tv_sec = 0;
+    itimer.it_interval.tv_sec = 0;
+    itimer.it_value.tv_sec = 0;
+    itimer.it_value.tv_usec = 100000;
+
+    setitimer(ITIMER_REAL, &itimer, NULL);
+
+    noecho();
+    cbreak();
+    keypad(stdscr, TRUE);
+
+    while (1) {
+		int c = getchar();
+		switch (c) {
+			case 'a':
+				ctl_msg.ctl.dirx -= 1;
+				break;
+			case 'd':
+				ctl_msg.ctl.dirx += 1;
+				break;
+			case 'w':
+				ctl_msg.ctl.diry -= 1;
+				break;
+			case 's':
+				ctl_msg.ctl.diry += 1;
+				break;
+			case 13:
+				send_chat();
+				break;
+			case ' ':
+				show_strength();
+				break;
+			case 'j':
+				stop_ball();
+				break;
+			case 'l':
+				carry_ball();
+				break;
+			case 'k':
+				kick_ball();
+				break;
+			default:
+				break;
+		}
+	}
+
+
+
+/*
     pid_t pid;
     if ((pid = fork()) < 0) {
         perror("fork");
@@ -122,6 +209,8 @@ int main(int argc, char **argv) {
         } 
     }
 //    pthread_create(&recv_t, NULL, client_recv, NULL);
+*/
+    sleep(10);
     return 0;
 
 }

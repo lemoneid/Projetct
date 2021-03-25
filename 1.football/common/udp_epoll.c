@@ -83,7 +83,7 @@ int udp_accept(int epollfd, int fd, struct User *user) {
 
     if (check_online(&request)) {
         response.type = 1;
-        strcpy(response.msg, "Login failed with NewWork Errors!");
+        strcpy(response.msg, "You are already playing this game somewhere");
         sendto(fd, (void *)&response, sizeof(response), 0, (struct sockaddr *)&client, len);
 
     }
@@ -97,14 +97,14 @@ int udp_accept(int epollfd, int fd, struct User *user) {
     } else {
         DBG(GREEN"INFO"NONE" : "RED" %s on %s:%d login! (%s)\n"NONE, request.name, inet_ntoa(client.sin_addr), ntohs(client.sin_port), request.msg);
     }
+
 	strcpy(user->name, request.name);
-    /*
 	if (request.team == 0) user->loc.x = 2;
 	else user->loc.x = court.width - 3;
 	user->loc.y = court.height / 2;
-    */
 	user->team = request.team;
-    new_fd = udp_connect(fd, (struct sockaddr *)&client);
+
+    new_fd = udp_connect(epollfd, (struct sockaddr *)&client);
     user->fd = new_fd;
     return new_fd;
 }

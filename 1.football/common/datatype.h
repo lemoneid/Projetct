@@ -7,6 +7,10 @@
 
 #ifndef _DATATYPE_H
 #define _DATATYPE_H
+
+#define MAX_MSG 1024
+#define MAX_USER 50
+
 struct Point {
     int x;
     int y;
@@ -56,7 +60,8 @@ struct BallStatus {
     struct Aspeed a;
     int by_team;
     char name[20];
-    //pthread_mutex_t mutex;
+    int carry;
+    pthread_mutex_t mutex;
 };
 struct Score{
     int red;
@@ -83,10 +88,8 @@ struct Ctl{
 #define FT_FIN 0x40 //离场
 #define FT_SCORE 0x80 //比分变化
 #define FT_GAMEOVER 0x100 //gameover
-#define MAX_MSG 1024
-#define MAX_USER 50
 struct FootBallMsg {
-    int type;
+    int type; //l, c,, k, s, n, e
     int size;
     int team;
     char name[20];

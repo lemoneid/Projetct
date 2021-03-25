@@ -36,7 +36,7 @@ void heart_beat_team(struct User *team) {
 
 void *heart_beat(void *arg) {
     while (1) {
-        sleep(1);
+        sleep(4);
         heart_beat_team(bteam);
         heart_beat_team(rteam);
     }
