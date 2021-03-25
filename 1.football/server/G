@@ -1,0 +1,1 @@
+gcc ../common/*c server.c -lpthread  -o server -lm -lncurses

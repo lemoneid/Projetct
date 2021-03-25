@@ -8,6 +8,7 @@
 #include "./color.h"
 #include "./common.h"
 #include "./head.h"
+#include "./udp_socket.h"
 extern int port;
 extern struct User *rteam;
 extern struct User *bteam;

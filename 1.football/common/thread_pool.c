@@ -94,7 +94,7 @@ struct User *task_queue_pop(struct task_queue *taskQueue) {
     return user;
 }
 
-void thread_run(void *arg) {
+void *thread_run(void *arg) {
     pthread_t tid = pthread_self();
     pthread_detach(tid);
     struct task_queue *taskQueue = (struct task_queue *)arg;

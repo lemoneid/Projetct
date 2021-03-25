@@ -9,17 +9,19 @@
 #include "../common/head.h"
 #include "../common/color.h"
 #include "../common/datatype.h"
-#include "../common/game_ui.h"
+#include "../common/game.h"
 #include "../common/thread_pool.h"
-#include "../common/sub_reactor.c"
+#include "../common/sub_reactor.h"
 #include "../common/udp_epoll.h"
+#include "../common/udp_socket.h"
 
 char *conf = "./server.conf";
 struct User *rteam;
 struct User *bteam;
 struct Bpoint ball;
 struct BallStatus ball_status;
-
+struct Map court;
+WINDOW *Football, *Message, *Help, *Score, *Write, *Football_t;
 int repollfd, bepollfd;
 int data_port;
 int port = 0;
@@ -27,7 +29,7 @@ int port = 0;
 
 int main(int argc, char **argv) {
     int opt, listener, epoll_fd;
-
+    pthread_t draw_t, red_t, blue_t, heart_t;
     while ((opt = getopt(argc, argv, "p:")) != -1) {
         switch (opt) {
             case 'p' :
@@ -48,16 +50,18 @@ int main(int argc, char **argv) {
     }
     
     if (!port) port = atoi(get_conf_value(conf, "PORT"));
-    data_port = atoi(get_value(conf, "DATAPORT"));
+    data_port = atoi(get_conf_value(conf, "DATAPORT"));
+    /*
     court.width = atoi(get_value(conf, "COLS"));
     court.height = atoi(get_value(conf, "LINES"));
     court.start.x = 3;
     court.start.y = 3;
     ball.x = court.width / 2;
 	ball.y = court.height / 2;
+    */
 
-    rteam = (struct User *)calloc(MAX, sizeof(struct User));
-    bteam = (struct User *)calloc(MAX, sizeof(struct User));
+    rteam = (struct User *)calloc(MAX_USER, sizeof(struct User));
+    bteam = (struct User *)calloc(MAX_USER, sizeof(struct User));
     
     if ((listener = socket_create_udp(port)) < 0) {
         perror("socket_creat_dup");
@@ -70,9 +74,9 @@ int main(int argc, char **argv) {
 #ifndef _D
     //pthread_create(&draw_t, NULL, draw, NULL);
 #endif
-    epoll_fd = epoll_create(MAX * 2);
-    repollfd = epoll_create(MAX);
-    bepollfd = epoll_create(MAX);
+    epoll_fd = epoll_create(MAX_USER* 2);
+    repollfd = epoll_create(MAX_USER);
+    bepollfd = epoll_create(MAX_USER);
 
     if (epoll_fd < 0 || repollfd < 0 || bepollfd < 0) {
         perror("epoll_create");
@@ -81,24 +85,22 @@ int main(int argc, char **argv) {
 
     struct task_queue redQueue;
     struct task_queue blueQueue;
-    task_queue_init(&redQueue, MAX, repollfd);
-    task_queue_init(&blueQueue, MAX, bepollfd);
-    pthread(&red_t, NULL, sub_reactor, (void *)redQueue);
-    Pthread(&blue_t, NULL, sub_reactor, (void *)blueQueue);
+    task_queue_init(&redQueue, MAX_USER, repollfd);
+    task_queue_init(&blueQueue, MAX_USER, bepollfd);
+    pthread_create(&red_t, NULL, sub_reactor, (void *)&redQueue);
+    pthread_create(&blue_t, NULL, sub_reactor, (void *)&blueQueue);
 
-    struct epoll_event ev, events[MAX * 2];
+    struct epoll_event ev, events[MAX_USER * 2];
     ev.events = EPOLLIN;
     ev.data.fd = listener;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listener, &ev);
-    struct LogData lg;
     //ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
-    struct sockaddr *src_addr, socklen_t *addrlen);
     struct sockaddr_in client;
     socklen_t len = sizeof(client);
     //UDP实际只有listener一个文件
     while (1) {
         DBG(YELLOW"Main Pthread"NONE" : before epoll_wait\n");
-        int nfds = epoll_wait(epoll_fd, events, MAX * 2, -1);
+        int nfds = epoll_wait(epoll_fd, events, MAX_USER * 2, -1);
         DBG(YELLOW"Main Pthread"NONE" : after epoll_wait\n");
 
 
@@ -110,8 +112,11 @@ int main(int argc, char **argv) {
                 int new_fd = udp_accept(epoll_fd, listener, &user);
                 if (new_fd > 0) {
                     DBG(YELLOW"Main Thread"NONE" : Add %s to %s sub_reactor\n", user.name, (user.team ? "BLUE" : "RED"));
+                    add_to_sub_reactor(&user);
                 }
-
+            } else {
+                recv(events[i].data.fd, buff, sizeof(buff), 0);
+                DBG(PINK"RECV"NONE" : %s\n", buff);
             }
         }
     }
