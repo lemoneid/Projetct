@@ -85,8 +85,10 @@ int main(int argc, char **argv) {
 
     struct task_queue redQueue;
     struct task_queue blueQueue;
+
     task_queue_init(&redQueue, MAX_USER, repollfd);
     task_queue_init(&blueQueue, MAX_USER, bepollfd);
+    
     pthread_create(&red_t, NULL, sub_reactor, (void *)&redQueue);
     pthread_create(&blue_t, NULL, sub_reactor, (void *)&blueQueue);
 
@@ -95,6 +97,7 @@ int main(int argc, char **argv) {
     ev.data.fd = listener;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listener, &ev);
     //ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+
     struct sockaddr_in client;
     socklen_t len = sizeof(client);
     //UDP实际只有listener一个文件

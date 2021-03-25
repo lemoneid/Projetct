@@ -83,6 +83,13 @@ int udp_accept(int epollfd, int fd, struct User *user) {
         return -1;
     }
 
+    if (check_online(&request)) {
+        response.type = 1;
+        strcpy(response.msg, "Login failed with NewWork Errors!");
+        sendto(fd, (void *)&response, sizeof(response), 0, (struct sockaddr *)&client, len);
+
+    }
+
     response.type = 0;
     strcpy(response.msg, "Login success, Enjoy youself.");
     sendto(fd, (void *)&response, sizeof(response), 0, (struct sockaddr *)&client, len);
@@ -112,7 +119,7 @@ int find_sub(struct User *team) {
 
 void add_to_sub_reactor(struct User *user) {
     struct User *team = (user->team ? bteam : rteam);
-   DBG(YELLOW"Main Thread : "NONE"Add to sub_reactor\n");
+    DBG(YELLOW"Main Thread : "NONE"Add to sub_reactor\n");
 	int sub = find_sub(team);
 	team[sub] = *user; //把user里的数据拷贝一份到team数组中
 	team[sub].online = 1;

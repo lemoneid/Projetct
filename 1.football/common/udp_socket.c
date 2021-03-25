@@ -13,7 +13,7 @@ int socket_udp() {
         perror("socket");
         return -1;
     }
-    make_non_block(sockfd);
+    //make_non_block(sockfd);
     return sockfd;
 }
 int socket_create_udp(int port) {

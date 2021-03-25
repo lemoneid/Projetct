@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
     struct sockaddr_in server;
     server.sin_family = AF_INET;
-    server.sin_port = server_port;
+    server.sin_port = htons(server_port);
     server.sin_addr.s_addr = inet_addr(server_ip);
     socklen_t len = sizeof(struct sockaddr_in);
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
                 msg.type = FT_ACK;
                 send(sockfd, (void *)&msg, sizeof(msg), 0);
             } else if (msg.type & (FT_MSG | FT_WALL)) {
-                DBG(GREEN" Server Msg : "NONE"%s\n", msg.msg); 
+                DBG(GREEN"Server Msg : "NONE"%s\n", msg.msg); 
             } else {
                 DBG(GREEN"Server Msg : "NONE"Unsupport Message Type.\n");
             }
