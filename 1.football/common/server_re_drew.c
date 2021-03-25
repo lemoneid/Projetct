@@ -6,7 +6,6 @@
  ************************************************************************/
 #include "head.h"
 #include "game.h"
-#include ""
 
 extern struct User *rteam,*bteam;
 extern WINDOW *Football, *Football_t, *Score;

@@ -15,20 +15,23 @@
 #include "../common/udp_epoll.h"
 #include "../common/udp_socket.h"
 #include "../common/heart_beat.h"
+#include "../common/server_exit.h"
+#include "../common/server_re_drew.h"
+#include "../common/ball_status.h"
 
 char *conf = "./football.conf";
 struct User *rteam;
 struct User *bteam;
 struct Bpoint ball;
 struct BallStatus ball_status;
-struct Map court;
-WINDOW *Football, *Message, *Help, *Score, *Write, *Football_t;
+
 int repollfd, bepollfd;
-int data_port;
+int data_port = 0;
 int port = 0;
 
 
 int main(int argc, char **argv) {
+    setlocale(LC_ALL, "");
     int opt, listener, epoll_fd;
     pthread_t draw_t, red_t, blue_t, heart_t;
     while ((opt = getopt(argc, argv, "p:")) != -1) {
@@ -42,8 +45,8 @@ int main(int argc, char **argv) {
         }
     }
 
-    argc -= (optind);
-    argv += (optind);
+    argc -= (optind - 1);
+    argv += (optind - 1);
 
     if (argc > 1) {
         fprintf(stderr, "Usage %s [-p port]\n", argv[0]);
@@ -52,14 +55,12 @@ int main(int argc, char **argv) {
     
     if (!port) port = atoi(get_conf_value(conf, "SERVERPORT"));
     data_port = atoi(get_conf_value(conf, "DATAPORT"));
-    /*
-    court.width = atoi(get_value(conf, "COLS"));
-    court.height = atoi(get_value(conf, "LINES"));
+    court.width = atoi(get_conf_value(conf, "COLS"));
+    court.height = atoi(get_conf_value(conf, "LINES"));
     court.start.x = 3;
     court.start.y = 3;
     ball.x = court.width / 2;
 	ball.y = court.height / 2;
-    */
 
     rteam = (struct User *)calloc(MAX_USER, sizeof(struct User));
     bteam = (struct User *)calloc(MAX_USER, sizeof(struct User));
@@ -73,7 +74,7 @@ int main(int argc, char **argv) {
 
     DBG(GREEN"INFO"NONE" : Server start on Port %d\n", port);
 #ifndef _D
-    //pthread_create(&draw_t, NULL, draw, NULL);
+    pthread_create(&draw_t, NULL, draw, NULL);
 #endif
     epoll_fd = epoll_create(MAX_USER* 2);
     repollfd = epoll_create(MAX_USER);
@@ -98,17 +99,27 @@ int main(int argc, char **argv) {
     ev.events = EPOLLIN;
     ev.data.fd = listener;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listener, &ev);
-    //ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 
     struct sockaddr_in client;
     socklen_t len = sizeof(client);
     //UDP实际只有listener一个文件
+
+	signal(14, re_drew);
+	
+	struct itimerval itimer;
+	itimer.it_interval.tv_sec = 0;
+	itimer.it_interval.tv_usec = 50000;
+	itimer.it_value.tv_sec = 1;
+	itimer.it_value.tv_usec = 0;
+
+	setitimer(ITIMER_REAL, &itimer, NULL);
+
+	Show_Message(, , "Waiting for Login", 1);
+
     while (1) {
         DBG(YELLOW"Main Pthread"NONE" : before epoll_wait\n");
         int nfds = epoll_wait(epoll_fd, events, MAX_USER * 2, -1);
         DBG(YELLOW"Main Pthread"NONE" : after epoll_wait\n");
-
-
         for (int i = 0; i < nfds; i++) {
             struct User user;
             char buff[512] = {0};
@@ -118,6 +129,9 @@ int main(int argc, char **argv) {
                 if (new_fd > 0) {
                     DBG(YELLOW"Main Thread"NONE" : Add %s to %s sub_reactor\n", user.name, (user.team ? "BLUE" : "RED"));
                     add_to_sub_reactor(&user);
+                    show_data_stream('l');
+                    sprintf(buff, "%s login the Game.", user.name);
+                    Show_Message( , , buff, 1);
                 }
             } else {
                 recv(events[i].data.fd, buff, sizeof(buff), 0);

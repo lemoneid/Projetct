@@ -10,6 +10,7 @@
 
 #define MAX_MSG 1024
 #define MAX_USER 50
+#include <pthread.h>
 
 struct Point {
     int x;

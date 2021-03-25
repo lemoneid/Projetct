@@ -7,6 +7,7 @@
 
 #ifndef _CLIENT_RE_DREW_H
 #define _CLIENT_RE_DREW_H
+#include "cJSON.h"
 void re_drew(cJSON *root);
 void re_drew_player(cJSON *users);
 #endif

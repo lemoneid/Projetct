@@ -13,6 +13,8 @@ extern WINDOW *Football, *Football_t, *Message, *Help, *Score, *Write;//窗体
 extern struct Bpoint ball;  //球的位置
 extern struct BallStatus ball_status;
 int message_num = 0;
+int rscore = 0;
+int bscore = 0;
 
 WINDOW *create_newwin(int width, int height, int startx, int starty) {
     WINDOW *win;
@@ -88,11 +90,19 @@ void initfootball() {
 
 
 void init_help() {
+    /*
 	w_gotoxy_puts(Help, 1, 1, "wasd - 控制上下左右");
 	w_gotoxy_puts(Help, 1, 2, "  j  - 停球");
 	w_gotoxy_puts(Help, 1, 3, "  k  - 踢球");
 	w_gotoxy_puts(Help, 1, 4, "  l  - 带球");
 	w_gotoxy_puts(Help, 1, 5, "空格 - 选择力度");
+    */
+    w_gotoxy_puts(Help, 1, 1, "wasd - control");
+	w_gotoxy_puts(Help, 1, 2, "  j  - stop");
+	w_gotoxy_puts(Help, 1, 3, "  k  - kick");
+	w_gotoxy_puts(Help, 1, 4, "  l  - carry");
+	w_gotoxy_puts(Help, 1, 5, "space - strength");
+
 }
 
 void *draw(void *arg) {

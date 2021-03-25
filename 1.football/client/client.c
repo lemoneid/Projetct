@@ -9,8 +9,11 @@
 #include "../common/datatype.h"
 #include "../common/udp_socket.h"
 #include "../common/game.h"
-#include "../common/send_info.h"
+#include "../common/send_ctl.h"
+#include "../common/send_chat.h"
 #include "../common/show_strength.h"
+#include "../common/client_recver.h"
+#include "../common/client_re_drew.h"
 
 char server_ip[20] = {0};
 int server_port = 0;
@@ -18,6 +21,7 @@ char *conf = "./football.conf";
 int sockfd;
 struct FootBallMsg chat_msg;
 struct FootBallMsg ctl_msg;
+struct Bpoint ball;
 
 void logout(int signum);
 
@@ -47,13 +51,13 @@ int main(int argc, char **argv) {
                 server_port = atoi(optarg);
                 break;
             case 'n' :
-                strcpy(request.name, optart);
+                strcpy(request.name, optarg);
                 break;
             case 't' :
                 request.team = !!(atoi(optarg));
                 break;
             case 'm' :
-                strcpy(request.msg, optart);
+                strcpy(request.msg, optarg);
                 break;
             default :
                 fprintf(stderr, "Usage : %s [-h host] [-p port] [-n name] [-t team] [-m msg ]\n", argv[0]);

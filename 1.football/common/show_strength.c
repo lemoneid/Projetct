@@ -13,7 +13,8 @@
 //通过sockfd向服务端发送控制信息，踢球
 extern WINDOW *Write;
 extern int sockfd;
-extern strength = 1;
+extern struct Map court;
+int strength = 1;
 
 void set_ball(int flag, int strength) {
 	struct FootBallMsg msg;
@@ -54,7 +55,7 @@ void show_strength() {
 		mvwprintw(Write, 2, i, " ");
 	}
 	wrefresh(Write);
-	make_nonblock(0);
+	make_non_block(0);
 	while (1) {
 		char c = getchar();
 		if ( c != -1) {
