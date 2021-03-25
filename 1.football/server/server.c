@@ -15,7 +15,7 @@
 #include "../common/udp_epoll.h"
 #include "../common/udp_socket.h"
 
-char *conf = "./server.conf";
+char *conf = "./football.conf";
 struct User *rteam;
 struct User *bteam;
 struct Bpoint ball;
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
     
-    if (!port) port = atoi(get_conf_value(conf, "PORT"));
+    if (!port) port = atoi(get_conf_value(conf, "SERVERPORT"));
     data_port = atoi(get_conf_value(conf, "DATAPORT"));
     /*
     court.width = atoi(get_value(conf, "COLS"));

@@ -90,7 +90,38 @@ int main(int argc, char **argv) {
         }
     }
     connect(sockfd, (struct sockaddr *)&server, len);
-   // pthread_create(&recv_t, NULL, client_recv, NULL);
+    pid_t pid;
+    if ((pid = fork()) < 0) {
+        perror("fork");
+        exit(1);
+    }
+    if (pid == 0) {
+       fclose(stdin);
+        while (1) {
+            struct FootBallMsg msg;
+            ssize_t rsize = recv(sockfd, (void *)&msg, sizeof(msg), 0);
+            if (msg.type & FT_HEART) {
+                DBG(RED"HeartBeat from Server \n"NONE);
+                msg.type = FT_ACK;
+                send(sockfd, (void *)&msg, sizeof(msg), 0);
+            } else if (msg.type & (FT_MSG | FT_WALL)) {
+                DBG(GREEN" Server Msg : "NONE"%s\n", msg.msg); 
+            } else {
+                DBG(GREEN"Server Msg : "NONE"Unsupport Message Type.\n");
+            }
+        }
+    } else {
+        while (1) {
+            struct FootBallMsg msg;
+            msg.type = FT_MSG;
+            DBG(YELLOW"Input Message : "NONE);
+            fflush(stdout);
+            scanf("%[^\n]s", msg.msg);
+            getchar();
+            send(sockfd, (void *)&msg, sizeof(msg), 0);
+        } 
+    }
+//    pthread_create(&recv_t, NULL, client_recv, NULL);
     return 0;
 
 }
