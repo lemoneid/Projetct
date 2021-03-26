@@ -17,7 +17,6 @@ extern int bepollfd, repollfd;
 extern struct Bpoint ball;
 extern struct BallStatus ball_status;
 
-
 void do_echo(struct User *user) {
     struct FootBallMsg msg;
     int size = recv(user->fd, (void *)&msg, sizeof(msg), 0);

@@ -15,12 +15,12 @@ void *sub_reactor(void *arg) {
     for (int i = 0; i < MAX_THREAD; i++) {
         pthread_create(&tid[i], NULL, thread_run, (void *)taskQueue);
     }
-    struct epoll_event ev, events[MAX_USER];
+    struct epoll_event events[MAX_USER];
     int nfds;
     while (1) {
         DBG(RED"Sub Reactor : "NONE"Epoll waiting...\n");
         nfds  = epoll_wait(taskQueue->epollfd, events, MAX_USER, -1);
-        if (nfds < 0) {
+        if (nfds == -1) {
             perror("epoll_wait");
             exit(1);
         }

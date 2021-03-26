@@ -24,8 +24,10 @@ void heart_beat_team(struct User *team) {
         send(team[i].fd, (void *)&msg, sizeof(msg), 0);
         team[i].flag--;
         if (team[i].flag <= 0) {
-            char buff[512] = {0};
-            sprintf(buff, "%s is removed from list.", team[i].name);
+			show_data_stream('e');
+            char tmp[512] = {0};
+            sprintf(tmp, "%s is removed from list.", team[i].name);
+			Show_Message( , NULL, tmp, 1);
             team[i].online = 0;
             int epollfd_tmp = (team[i].team ? bepollfd : repollfd);
             del_event(epollfd_tmp, team[i].fd);
@@ -36,7 +38,7 @@ void heart_beat_team(struct User *team) {
 
 void *heart_beat(void *arg) {
     while (1) {
-        sleep(4);
+        sleep(10);
         heart_beat_team(bteam);
         heart_beat_team(rteam);
     }

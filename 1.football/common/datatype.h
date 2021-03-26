@@ -12,6 +12,8 @@
 #define MAX_USER 50
 #include <pthread.h>
 
+struct Map court;
+
 struct Point {
     int x;
     int y;
@@ -61,7 +63,9 @@ struct BallStatus {
     struct Aspeed a;
     int by_team;
     char name[20];
+    struct User *user;
     int carry;
+    int t;
     pthread_mutex_t mutex;
 };
 struct Score{

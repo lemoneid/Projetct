@@ -1,10 +1,15 @@
 /*************************************************************************
-	> File Name: udp_epoll.c
+	> File Name: test.c
 	> Author: yanzhiwei
-	> Mail: 1931248856@qq.com 
-	> Created Time: Wed Mar 24 09:00:31 2021
+	> Mail: 1931248856@qq.com
+	> Created Time: 2021年03月25日 星期四 20时36分14秒
  ************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 #include "./color.h"
 #include "./common.h"
 #include "./head.h"
@@ -23,6 +28,7 @@ void add_event(int epollfd, int fd, int events) {
     DBG(YELLOW"EPOLL"NONE" : After Epoll Add.\n");
 }
 
+
 void add_event_ptr(int epollfd, int fd, int events, struct User *user) {
     struct epoll_event ev;
     ev.events = events;
@@ -37,8 +43,8 @@ void del_event(int epollfd, int fd) {
 
 int udp_connect(int epollfd, struct sockaddr *serveraddr) {
     int sockfd;
-    if ((sockfd = socket_create_udp(port)) < 0) {
-        perror("socket_create_udp");
+    if ((sockfd = socket_udp()) < 0) {
+        perror("socket_udp");
         return -1;
     }
     if (connect(sockfd, (struct sockaddr *)serveraddr, sizeof(struct sockaddr)) < 0) {
@@ -82,9 +88,9 @@ int udp_accept(int epollfd, int fd, struct User *user) {
 
     if (check_online(&request)) {
         response.type = 1;
-        strcpy(response.msg, "You are already playing this game somewhere");
+        strcpy(response.msg, "Login failed with NewWork Errors!");
         sendto(fd, (void *)&response, sizeof(response), 0, (struct sockaddr *)&client, len);
-        return -1;
+
     }
 
     response.type = 0;
@@ -96,13 +102,14 @@ int udp_accept(int epollfd, int fd, struct User *user) {
     } else {
         DBG(GREEN"INFO"NONE" : "RED" %s on %s:%d login! (%s)\n"NONE, request.name, inet_ntoa(client.sin_addr), ntohs(client.sin_port), request.msg);
     }
-
 	strcpy(user->name, request.name);
+    /*
 	if (request.team == 0) user->loc.x = 2;
 	else user->loc.x = court.width - 3;
 	user->loc.y = court.height / 2;
+    */
 	user->team = request.team;
-    new_fd = udp_connect(epollfd, (struct sockaddr *)&client);
+    new_fd = udp_connect(fd, (struct sockaddr *)&client);
     user->fd = new_fd;
     return new_fd;
 }
@@ -126,3 +133,4 @@ void add_to_sub_reactor(struct User *user) {
 	} else
 		add_event_ptr(repollfd, team[sub].fd, EPOLLIN | EPOLLET, &team[sub]);
 }
+

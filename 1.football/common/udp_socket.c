@@ -26,12 +26,13 @@ int socket_create_udp(int port) {
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
     server.sin_addr.s_addr = INADDR_ANY;
-
+    
     int opt = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
         perror("setsockopt");
         return -1;
     }
+
     make_non_block(sockfd);
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
         perror("bind");

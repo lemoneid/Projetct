@@ -1,11 +1,14 @@
 /*************************************************************************
 	> File Name: server_re_drew.c
-	> Author: yanzhiwei
-	> Mail: 1931248856@qq.com
-	> Created Time: 2021年03月25日 星期四 21时00分58秒
+	> Author: lbh
+	> Mail: 2052658718@qq.com
+	> Created Time: 2020年06月14日 星期日 20时29分32秒
  ************************************************************************/
+
 #include "head.h"
 #include "game.h"
+#include "server_exit.h"
+#define MAX 50
 
 extern struct User *rteam,*bteam;
 extern WINDOW *Football, *Football_t, *Score;
@@ -24,13 +27,20 @@ void re_drew_player(int team, char *name, struct Point *loc) {
 }
 
 void re_drew_team(struct User *team) {
-	for (int i = 0; i < MAX_USER; i++) {
+	for (int i = 0; i < MAX ; i++) {
 		if (!team[i].online) continue;
 		re_drew_player(team[i].team, team[i].name, &team[i].loc);
 	}
 }
 
 void re_drew_ball() {
+	if (ball_status.carry) {
+		ball.x = ball_status.user->loc.x;
+		ball.y = ball_status.user->loc.y;
+		if (ball_status.user->team) {
+			ball.x -= 1;
+		} else ball.x += 1;
+	}
 	if (ball_status.v.x != 0 || ball_status.v.y != 0) {
 		ball.x += ball_status.v.x * 0.1 + ball_status.a.x * 0.5 * 0.01;
 		ball.y += ball_status.v.y * 0.1 + ball_status.a.y * 0.5 * 0.01;
@@ -120,6 +130,3 @@ void re_drew() {
 	wrefresh(Football);
 	wrefresh(Football_t);
 }
-
-
-

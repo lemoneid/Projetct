@@ -21,7 +21,6 @@ char *conf = "./football.conf";
 int sockfd;
 struct FootBallMsg chat_msg;
 struct FootBallMsg ctl_msg;
-struct Bpoint ball;
 
 void logout(int signum);
 
@@ -73,7 +72,7 @@ int main(int argc, char **argv) {
 
     if (!server_port) server_port = atoi(get_conf_value(conf, "SERVERPORT"));
     if (!strlen(server_ip)) strcpy(server_ip, get_conf_value(conf, "SERVERIP"));
-        if (!strlen(request.name)) strcpy(request.name, get_conf_value(conf, "NAME"));
+    if (!strlen(request.name)) strcpy(request.name, get_conf_value(conf, "NAME"));
     if (!strlen(request.msg)) strcpy(request.msg, get_conf_value(conf, "LOGMSG"));
     if (!request.team) request.team = atoi(get_conf_value(conf, "TEAM"));
     DBG(GREEN"Name=%s, team=%d, msg=%s, IP=%s, port=%d\n"NONE,request.name, request.team, request.msg ,server_ip, server_port)
@@ -90,7 +89,7 @@ int main(int argc, char **argv) {
     server.sin_port = htons(server_port);
     server.sin_addr.s_addr = inet_addr(server_ip);
 
-    socklen_t len = sizeof(struct sockaddr_in);
+    socklen_t len = sizeof(server);
 
     DBG(GREEN"INFO"NONE" : server_ip = %s, server_port = %d, name = %s, team = %s logmsg = %s\n", server_ip, server_port, request.name, (request.team ? "BLUE" : "RED"), request.msg);
 
@@ -133,7 +132,7 @@ int main(int argc, char **argv) {
 
     struct itimerval itimer;
     itimer.it_interval.tv_sec = 0;
-    itimer.it_interval.tv_sec = 0;
+    itimer.it_interval.tv_sec = 100000;
     itimer.it_value.tv_sec = 0;
     itimer.it_value.tv_usec = 100000;
 
@@ -178,42 +177,6 @@ int main(int argc, char **argv) {
 		}
 	}
 
-
-
-/*
-    pid_t pid;
-    if ((pid = fork()) < 0) {
-        perror("fork");
-        exit(1);
-    }
-    if (pid == 0) {
-       fclose(stdin);
-        while (1) {
-            struct FootBallMsg msg;
-            ssize_t rsize = recv(sockfd, (void *)&msg, sizeof(msg), 0);
-            if (msg.type & FT_HEART) {
-                DBG(RED"HeartBeat from Server \n"NONE);
-                msg.type = FT_ACK;
-                send(sockfd, (void *)&msg, sizeof(msg), 0);
-            } else if (msg.type & (FT_MSG | FT_WALL)) {
-                DBG(GREEN"Server Msg : "NONE"%s\n", msg.msg); 
-            } else {
-                DBG(GREEN"Server Msg : "NONE"Unsupport Message Type.\n");
-            }
-        }
-    } else {
-        while (1) {
-            struct FootBallMsg msg;
-            msg.type = FT_MSG;
-            DBG(YELLOW"Input Message : "NONE);
-            fflush(stdout);
-            scanf("%[^\n]s", msg.msg);
-            getchar();
-            send(sockfd, (void *)&msg, sizeof(msg), 0);
-        } 
-    }
-//    pthread_create(&recv_t, NULL, client_recv, NULL);
-*/
     sleep(10);
     return 0;
 
