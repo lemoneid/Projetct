@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
 
     struct itimerval itimer;
     itimer.it_interval.tv_sec = 0;
-    itimer.it_interval.tv_sec = 100000;
+    itimer.it_interval.tv_usec = 100000;
     itimer.it_value.tv_sec = 0;
     itimer.it_value.tv_usec = 100000;
 

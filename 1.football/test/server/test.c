@@ -1,9 +1,15 @@
 /*************************************************************************
-	> File Name: server.c
-	> Author: wei 
-	> Mail: 1931248856@qq.com 
-	> Created Time: Tue Mar 23 14:59:03 2021
+	> File Name: test.c
+	> Author: yanzhiwei
+	> Mail: 1931248856@qq.com
+	> Created Time: 2021年03月25日 星期四 21时49分51秒
  ************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
 
 #include "../common/common.h"
 #include "../common/head.h"
@@ -14,24 +20,24 @@
 #include "../common/sub_reactor.h"
 #include "../common/udp_epoll.h"
 #include "../common/udp_socket.h"
+#include "../common/heart_beat.h"
 #include "../common/server_exit.h"
 #include "../common/server_re_drew.h"
 #include "../common/ball_status.h"
-#include "../common/heart_beat.h"
 
 char *conf = "./football.conf";
 struct User *rteam;
 struct User *bteam;
 struct Bpoint ball;
 struct BallStatus ball_status;
-
+struct Map court;
+WINDOW *Football, *Message, *Help, *Score, *Write, *Football_t;
 int repollfd, bepollfd;
 int data_port = 0;
 int port = 0;
 
 
 int main(int argc, char **argv) {
-    setlocale(LC_ALL, "");
     int opt, listener, epoll_fd;
     pthread_t draw_t, red_t, blue_t, heart_t;
     while ((opt = getopt(argc, argv, "p:")) != -1) {
@@ -45,8 +51,8 @@ int main(int argc, char **argv) {
         }
     }
 
-    argc -= (optind - 1);
-    argv += (optind - 1);
+    argc -= (optind);
+    argv += (optind);
 
     if (argc > 1) {
         fprintf(stderr, "Usage %s [-p port]\n", argv[0]);
@@ -74,7 +80,7 @@ int main(int argc, char **argv) {
 
     DBG(GREEN"INFO"NONE" : Server start on Port %d\n", port);
 #ifndef _D
-    pthread_create(&draw_t, NULL, draw, NULL);
+    //pthread_create(&draw_t, NULL, draw, NULL);
 #endif
     epoll_fd = epoll_create(MAX_USER* 2);
     repollfd = epoll_create(MAX_USER);
@@ -142,3 +148,4 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
