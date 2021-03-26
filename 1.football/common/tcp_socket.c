@@ -46,10 +46,6 @@ int socket_create(int port) {
         perror("bind");
         return -1;
     }
-    if (listen(sockfd, 10) < 0) {
-        perror("listen");
-        return -1;
-    }
     return sockfd;
 }
 

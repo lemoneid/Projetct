@@ -7,41 +7,34 @@
 
 #include "head.h"
 
-//在Write窗口中，显示踢球力度条，光标在进度条上快速移动
-//设置0文件为非阻塞IO
-//while 等待空格或者'k'键的按下，如果按下退出，取得当前的strength
-//通过sockfd向服务端发送控制信息，踢球
 extern WINDOW *Write;
 extern int sockfd;
-extern struct Map court;
 int strength = 1;
 
-void set_ball(int flag, int strength) {
+void kick_ball() {
 	struct FootBallMsg msg;
 	msg.type = FT_CTL;
-	msg.ctl.action = flag;
+	msg.ctl.action = ACTION_KICK;
 	msg.ctl.strength = strength;
 	send(sockfd, (void *)&msg, sizeof(msg), 0);
-    return ;
-}
-
-void stop_ball() {
-    set_ball(ACTION_STOP, 0); 
-    return ;
-}
-
-void kick_ball() {
-    set_ball(ACTION_KICK, strength);
-    return ;
 }
 
 void carry_ball() {
-    set_ball(ACTION_CARRY, 0);
-    return ;
+	struct FootBallMsg msg;
+	msg.type = FT_CTL;
+	msg.ctl.action = ACTION_CARRY;
+	send(sockfd, (void *)&msg, sizeof(msg), 0);
+}
+
+void stop_ball() {
+	struct FootBallMsg msg;
+	msg.type = FT_CTL;
+	msg.ctl.action = ACTION_STOP;
+	send(sockfd, (void *)&msg, sizeof(msg), 0);
 }
 
 void show_strength() {
-    int maxx, maxy, loc = 2, dir = 1;
+	int maxx, maxy, loc = 2, dir = 1;
 	int arr[5] = {1, 2, 3, 2, 1};
 	getmaxyx(Write, maxy, maxx);
 	for (int i = 2; i < maxx - 2; i++) {
@@ -55,7 +48,7 @@ void show_strength() {
 		mvwprintw(Write, 2, i, " ");
 	}
 	wrefresh(Write);
-	make_non_block(0);
+	make_nonblock(0);
 	while (1) {
 		char c = getchar();
 		if ( c != -1) {
@@ -87,3 +80,5 @@ void show_strength() {
 		wrefresh(Write);
 	}
 }
+
+

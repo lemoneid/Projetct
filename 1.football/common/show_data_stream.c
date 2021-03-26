@@ -12,9 +12,6 @@ extern struct Map court;
 //type： 'l','c','k','s','n','e'
 //分别表示：login， carry， kick， stop， normal， exit
 void show_data_stream(int type) {
-    //data_stream数组后移一位，将type加到第一位
-    //根据type不同，使用wattron设置Help窗口的颜色
-    //在合适位置打印一个空格
     for (int i = 18; i > 1; i--) {
 		data_stream[i] = data_stream[i - 1];
 	}

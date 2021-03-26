@@ -20,13 +20,8 @@ int can_access(struct Point *loc) {
 	return 0;
 }
 
-int can_kick(struct Point *loc, int strength){
-    //palyer和ball坐标对齐
-    //判断palyer和ball的坐标在上下左右2个单位距离内，则可踢球
-    //根据player和ball的相对位置，计算球的运动方向，加速度方向，假设球只能在palyer和ball的延长线上运动
-    //可踢返回1，否则返回0
-
-    	int px = loc->x;
+int can_kick(struct Point *loc, int strength) {
+    int px = loc->x;
 	int py = loc->y;
 
 	if (abs(px - (int)ball.x) <= 2 && abs(py - (int)ball.y) <= 2) {

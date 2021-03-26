@@ -71,7 +71,7 @@ void score_send(char *name) {
 
 void server_send() {
 	struct FootBallMsg msg;
-	msg.type = FT_MAP;
+	msg.type = FT_GAME;
 	for (int i = 0; i < MAX_USER; i++) {
 		if (rteam[i].online) {
 			strcpy(msg.msg, cJSON_Print(game_msg()));

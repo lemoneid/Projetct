@@ -7,10 +7,11 @@
 
 #ifndef _COMMON_H
 #define _COMMON_H
-void make_non_block_ioctl(int fd);
+extern char conf_ans[512];
+char *get_value(char *path, char *key);
+void make_nonblock_ioctl(int fd);
 void make_block_ioctl(int fd);
-int make_non_block(int fd);
-int make_block(int fd);
-char *get_conf_value(const char *path, const char *key);
+void make_nonblock(int fd);
+void make_block(int fd);
 #endif
 

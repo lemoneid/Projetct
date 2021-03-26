@@ -26,7 +26,7 @@ void heart_beat_team(struct User *team) {
 			if (team[i].flag <= 0) {
 				show_data_stream('e');
 				char tmp[512] = {0};
-				sprintf("%s is removed from list.", team[i].name);
+				sprintf(tmp, "%s is removed from list.", team[i].name);
 				Show_Message( , NULL, tmp, 1);
 				team[i].online = 0;
 				int epollfd_tmp = (team[i].team ? bepollfd : repollfd);

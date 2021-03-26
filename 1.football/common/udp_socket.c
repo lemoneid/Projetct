@@ -13,7 +13,6 @@ int socket_udp() {
         perror("socket");
         return -1;
     }
-    //make_non_block(sockfd);
     return sockfd;
 }
 int socket_create_udp(int port) {
@@ -33,7 +32,7 @@ int socket_create_udp(int port) {
         return -1;
     }
 
-    make_non_block(sockfd);
+    make_nonblock(sockfd);
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
         perror("bind");
         return -1;

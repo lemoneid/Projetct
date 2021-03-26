@@ -10,59 +10,67 @@
 #include "head.h"
 char conf_ans[512];
 
-char *get_conf_value(const char *path, const char *key) {
+char *get_value(char *path, char *key) {
     FILE *fp = NULL;
+    ssize_t nrd;
     char *line = NULL, *sub = NULL;
-    ssize_t nread = 0, len = 0;
+    size_t linecap;
     if (path == NULL || key == NULL) {
-        errno = EINVAL;
+        fprintf(stderr, "Error in argument!\n");
         return NULL;
     }
     if ((fp = fopen(path, "r")) == NULL) {
-        errno = EINVAL;
+        perror("fopen");
         return NULL;
     }
-    while ((nread = getline(&line, &len, fp)) != -1) {
-        if ((sub = strstr(line, key)) == NULL) {
+    while ((nrd = getline(&line, &linecap, fp)) != -1) {
+        if ((sub = strstr(line, key)) == NULL)
             continue;
+        else {
+            if (line[strlen(key)] == '=') {
+                strncpy(conf_ans, sub + strlen(key) + 1, nrd - strlen(key) - 2);
+                *(conf_ans + nrd - strlen(key) - 2) = '\0';
+                break;
+            }
         }
-        if (line[strlen(key)] == '=') {
-            strncpy(conf_ans, sub + strlen(key) + 1, nread - strlen(key) - 2);
-            *(conf_ans + nread - strlen(key) - 2) = '\0';
-            break;
-        }
-    } 
+    }
     free(line);
     fclose(fp);
-    if (sub == NULL) return NULL;
+    if (sub == NULL) {
+        return NULL;
+    }
     return conf_ans;
 }
 
-void make_non_block_ioctl(int fd) {
+
+
+void make_nonblock_ioctl(int fd){
     unsigned long ul = 1;
     ioctl(fd, FIONBIO, &ul);
 }
+
 
 void make_block_ioctl(int fd) {
     unsigned long ul = 0;
     ioctl(fd, FIONBIO, &ul);
 }
 
-int make_non_block(int fd) {
-    int flag; 
+
+void make_nonblock(int fd) {
+    int flag;
     if ((flag = fcntl(fd, F_GETFL)) < 0) {
-        return -1;
+        return;
     }
-    //flag |= O_NONBLOCK;
-    fcntl(fd, F_SETFL, flag|O_NONBLOCK);
-    return 0;
+    flag |= O_NONBLOCK;
+    fcntl(fd, F_SETFL, flag);
 }
 
-int make_block(int fd) {
-    int flag; 
+void make_block(int fd) {
+    int flag;
     if ((flag = fcntl(fd, F_GETFL)) < 0) {
-        return -1;
+        return ;
     }
-    fcntl(fd, F_SETFL, flag&~O_NONBLOCK);
-    return 0;
+    flag &= ~O_NONBLOCK;
+    fcntl(fd, F_SETFL, flag);
 }
+
