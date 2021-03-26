@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "../common/head.h"
-#include "../common/udp_socket.h"
+#include "../common/udp_client.h"
 #include "../common/client_recver.h"
 #include "../common/game.h"
 #include "../common/send_chat.h"
@@ -185,4 +185,3 @@ int main(int argc, char **argv)  {
 
     return 0;
 }
-

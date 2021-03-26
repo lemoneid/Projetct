@@ -73,4 +73,3 @@ void make_block(int fd) {
     flag &= ~O_NONBLOCK;
     fcntl(fd, F_SETFL, flag);
 }
-

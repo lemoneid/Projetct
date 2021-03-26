@@ -5,19 +5,18 @@
 	> Created Time: Tue Mar 23 14:59:03 2021
  ************************************************************************/
 
-#include "../common/common.h"
 #include "../common/head.h"
-#include "../common/color.h"
-#include "../common/datatype.h"
-#include "../common/game.h"
 #include "../common/thread_pool.h"
-#include "../common/sub_reactor.h"
+#include "../common/common.h"
+#include "../common/udp_server.h"
 #include "../common/udp_epoll.h"
-#include "../common/udp_socket.h"
+#include "../common/sub_reactor.h"
+#include "../common/heart_beat.h"
+#include "../common/game.h"
 #include "../common/server_exit.h"
 #include "../common/server_re_drew.h"
+#include "../common/show_data_stream.h"
 #include "../common/ball_status.h"
-#include "../common/heart_beat.h"
 
 char *conf = "./football.conf";
 
@@ -63,8 +62,8 @@ int main(int argc, char **argv) {
 	ball.x = court.width / 2;
 	ball.y = court.height / 2;
 
-    rteam = (struct User *)calloc(MAX_USER, sizeof(struct User));
-    bteam = (struct User *)calloc(MAX_USER, sizeof(struct User));
+    rteam = (struct User *)calloc(MAX, sizeof(struct User));
+    bteam = (struct User *)calloc(MAX, sizeof(struct User));
 
     if ((listener = socket_create_udp(port)) < 0) {
         perror("socket_create_udp");
@@ -76,9 +75,9 @@ int main(int argc, char **argv) {
     pthread_create(&draw_t, NULL, draw, NULL);
 #endif
 
-    epoll_fd = epoll_create(MAX_USER * 2);
-    repollfd = epoll_create(MAX_USER);
-    bepollfd = epoll_create(MAX_USER);
+    epoll_fd = epoll_create(MAX * 2);
+    repollfd = epoll_create(MAX);
+    bepollfd = epoll_create(MAX);
 
     if (epoll_fd < 0 || repollfd < 0 || bepollfd < 0) {
         perror("epoll_create");
@@ -88,24 +87,24 @@ int main(int argc, char **argv) {
 	struct task_queue redQueue;
 	struct task_queue blueQueue;
 
-	task_queue_init(&redQueue, MAX_USER, repollfd);
-	task_queue_init(&blueQueue, MAX_USER, bepollfd);
+	task_queue_init(&redQueue, MAX, repollfd);
+	task_queue_init(&blueQueue, MAX, bepollfd);
 
 	pthread_create(&red_t, NULL, sub_reactor, (void *)&redQueue);
 	pthread_create(&blue_t, NULL, sub_reactor, (void *)&blueQueue);
 	pthread_create(&heart_t, NULL, heart_beat, NULL);
-		
+
 	signal(SIGINT, server_exit);
 
-    struct epoll_event ev, events[MAX_USER * 2];
+    struct epoll_event ev, events[MAX * 2];
     ev.events = EPOLLIN;
     ev.data.fd = listener;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listener, &ev);
     struct sockaddr_in client;
     socklen_t len = sizeof(client);
-    
+
 	signal(14, re_drew);
-	
+
 	struct itimerval itimer;
 	itimer.it_interval.tv_sec = 0;
 	itimer.it_interval.tv_usec = 50000;
@@ -118,7 +117,7 @@ int main(int argc, char **argv) {
 
     while (1) {
 		DBG(YELLOW"Main Pthread"NONE" :  before epoll_wait\n");
-        int nfds = epoll_wait(epoll_fd, events, MAX_USER * 2, -1);
+        int nfds = epoll_wait(epoll_fd, events, MAX * 2, -1);
         DBG(YELLOW"Main Pthread"NONE" :  After epoll_wait\n");
 
         for (int i = 0; i < nfds; i++) {
@@ -139,11 +138,8 @@ int main(int argc, char **argv) {
                 recv(events[i].data.fd, buff, sizeof(buff), 0);
                 DBG(PINK"RECV"NONE" : %s\n", buff);
             }
-            //char info[1024] = {0};
-            //w_gotoxy_puts(Message, 1, 2, info);
         }
 
     }
     return 0;
 }
-

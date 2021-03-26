@@ -4,8 +4,10 @@
 	> Mail: 1931248856@qq.com
 	> Created Time: 2021年03月25日 星期四 20时52分23秒
  ************************************************************************/
- #include "head.h"
- #include "cJSON.h"
+
+#include "head.h"
+#include <signal.h>
+#define MAX 50
 extern struct User *rteam, *bteam;
 extern struct Bpoint ball;
 extern int bscore, rscore;
@@ -27,7 +29,7 @@ cJSON *game_msg() {
 	cJSON_AddNumberToObject(c_score, "bscore", bscore);
 	cJSON_AddNumberToObject(c_score, "rscore", rscore);
 
-	for (int i = 0; i < MAX_USER; i++) {
+	for (int i = 0; i < MAX; i++) {
 		if (rteam[i].online) {
 			cJSON *user = cJSON_CreateObject();
 			cJSON_AddNumberToObject(user, "team", rteam[i].team);
@@ -57,7 +59,7 @@ cJSON *score_msg(char *name) {
 void score_send(char *name) {
 	struct FootBallMsg msg;
 	msg.type = FT_SCORE;
-	for (int i = 0; i < MAX_USER; i++) {
+	for (int i = 0; i < MAX; i++) {
 		if (rteam[i].online) {
 			strcpy(msg.msg, cJSON_Print(score_msg(name)));
 			send(rteam[i].fd, (void *)&msg, sizeof(msg), 0);
@@ -72,7 +74,7 @@ void score_send(char *name) {
 void server_send() {
 	struct FootBallMsg msg;
 	msg.type = FT_GAME;
-	for (int i = 0; i < MAX_USER; i++) {
+	for (int i = 0; i < MAX; i++) {
 		if (rteam[i].online) {
 			strcpy(msg.msg, cJSON_Print(game_msg()));
 			send(rteam[i].fd, (void *)&msg, sizeof(msg), 0);
@@ -85,17 +87,17 @@ void server_send() {
 }
 
 void server_exit(int signum) {
-    struct FootBallMsg msg;
-    msg.type = FT_FIN;
-    for (int i = 0; i < MAX_USER; i++) {
-        if (rteam[i].online) {
-            send(rteam[i].fd, (void *)&msg, sizeof(msg), 0);
-        }
-        if (bteam[i].online) {
-            send(bteam[i].fd, (void *)&msg, sizeof(msg), 0);
-        }
-    }
-    endwin();
-    DBG(RED"Server stopped!\n"NONE);
-    exit(0);
+	struct FootBallMsg msg;
+	msg.type = FT_FIN;
+	for (int i = 0; i < MAX; i++) {
+		if (rteam[i].online) {
+			send(rteam[i].fd, (void *)&msg, sizeof(msg), 0);
+		}
+		if (bteam[i].online) {
+			send(bteam[i].fd, (void *)&msg, sizeof(msg), 0);
+		}
+	}
+	endwin();
+	DBG(RED"Server stopped!\n"NONE);
+	exit(0);
 }

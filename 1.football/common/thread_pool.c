@@ -4,7 +4,6 @@
 	> Mail: 1931248856@qq.com 
 	> Created Time: Wed Mar 24 19:29:58 2021
  ************************************************************************/
-
 #include "head.h"
 #include "thread_pool.h"
 #include "udp_epoll.h"
@@ -23,14 +22,14 @@ void do_echo(struct User *user) {
         if (user->team) {
 			DBG(L_BLUE" %s "NONE"心跳\n", user->name);
         } else {
-		    DBG(L_RED" %s "NONE"心跳\n", user->name);
-        }
-	} else if (msg.type & (FT_WALL | FT_MSG)) {
+			DBG(L_RED" %s "NONE"心跳\n", user->name);
+        } 
+	}else if (msg.type & (FT_WALL | FT_MSG)) {
         if (user->team) {
-			DBG(L_BLUE" %s : %s\n"NONE, user->name, msg.msg);
+		    DBG(L_BLUE" %s : %s\n"NONE, user->name, msg.msg);
         } else {
 			DBG(L_RED" %s : %s\n"NONE, user->name, msg.msg);
-        }
+        } 
 		strcpy(msg.name, user->name);
 		msg.team = user->team;
 		Show_Message( , user, msg.msg, );
@@ -62,7 +61,7 @@ void do_echo(struct User *user) {
 			show_data_stream('k');
 			if (can_kick(&user->loc, msg.ctl.strength)) {
 				ball_status.carry = 0;
-				ball_status.by_team = user->team;
+				ball_status.who = user->team;
 				strcpy(ball_status.name, user->name);
 			}
 		} else if (msg.ctl.action & ACTION_STOP) {

@@ -25,13 +25,20 @@ void re_drew_player(int team, char *name, struct Point *loc) {
 }
 
 void re_drew_team(struct User *team) {
-	for (int i = 0; i < MAX_USER; i++) {
+	for (int i = 0; i < MAX ; i++) {
 		if (!team[i].online) continue;
 		re_drew_player(team[i].team, team[i].name, &team[i].loc);
 	}
 }
 
 void re_drew_ball() {
+	if (ball_status.carry) {
+		ball.x = ball_status.user->loc.x;
+		ball.y = ball_status.user->loc.y;
+		if (ball_status.user->team) {
+			ball.x -= 1;
+		} else ball.x += 1;
+	}
 	if (ball_status.v.x != 0 || ball_status.v.y != 0) {
 		ball.x += ball_status.v.x * 0.1 + ball_status.a.x * 0.5 * 0.01;
 		ball.y += ball_status.v.y * 0.1 + ball_status.a.y * 0.5 * 0.01;
@@ -121,6 +128,3 @@ void re_drew() {
 	wrefresh(Football);
 	wrefresh(Football_t);
 }
-
-
-

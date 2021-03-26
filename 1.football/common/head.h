@@ -12,10 +12,10 @@
 #include "color.h"
 #include "common.h"
 #include "datatype.h"
+#include "cJSON.h"
 //
 #include <ncurses.h>
 #include <locale.h>
-//#include "cJSON.h"
 
 //system
 #include <math.h>

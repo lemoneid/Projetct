@@ -7,7 +7,6 @@
 
 #include "head.h"
 #include "game.h"
-#include "cJSON.h"
 #include "client_re_drew.h"
 
 extern int sockfd;
@@ -20,7 +19,7 @@ void *client_recv(void *arg) {
 		recv(sockfd, (void *)&msg, sizeof(msg), 0);
 		strcpy(user.name, msg.name);
 		user.team = msg.team;
-		if (msg.type & FT_HEART) {
+		if (msg.type & FT_TEST) {
 			DBG(RED"HeartBeat from Server 心跳\n"NONE);
 			msg.type = FT_ACK;
 			send(sockfd, (void *)&msg, sizeof(msg), 0);
@@ -32,7 +31,7 @@ void *client_recv(void *arg) {
 			Show_Message( , NULL, msg.msg, 1);
 		} else if (msg.type & FT_FIN) {
 			DBG(GREEN"Server is going to stop!\n"NONE);
-			endwin();	
+			endwin();
 			exit(0);
 		} else if (msg.type & FT_GAME) {
 			cJSON *root = cJSON_Parse(msg.msg);
@@ -47,4 +46,3 @@ void *client_recv(void *arg) {
 		}
 	}
 }
-

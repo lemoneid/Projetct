@@ -4,15 +4,15 @@
 	> Mail: 1931248856@qq.com
 	> Created Time: 2021年03月25日 星期四 20时43分13秒
  ************************************************************************/
+
 #include "head.h"
+
 extern char data_stream[20];
 extern WINDOW *Help;
 extern struct Map court;
 
-//type： 'l','c','k','s','n','e'
-//分别表示：login， carry， kick， stop， normal， exit
 void show_data_stream(int type) {
-    for (int i = 18; i > 1; i--) {
+	for (int i = 18; i > 1; i--) {
 		data_stream[i] = data_stream[i - 1];
 	}
 	data_stream[1] = type;
@@ -43,5 +43,4 @@ void show_data_stream(int type) {
 		wattron(Help, COLOR_PAIR(2));
 	}
 	wrefresh(Help);
-    return ;
 }

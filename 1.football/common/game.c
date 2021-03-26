@@ -6,9 +6,9 @@
  ************************************************************************/
 
 #include "head.h"
-#include <ncurses.h>
-extern struct Map court;//球场大小，你应该在server.c和client.c中定义该变量，并初始化
-extern WINDOW *Football, *Football_t, *Message, *Help, *Score, *Write;//窗体
+
+extern struct Map court;
+extern WINDOW *Football, *Message, *Help, *Score, *Write, *Football_t;
 int message_num = 0;
 int rscore = 0;
 int bscore = 0;
@@ -18,16 +18,21 @@ WINDOW *create_newwin(int width, int height, int startx, int starty) {
     win = newwin(height, width, starty, startx);
     box(win, 0, 0);
     wrefresh(win);
+    //move(LINES - 1, 1);
     return win;
 }
+
 void destroy_win(WINDOW *win) {
     wborder(win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
     wrefresh(win);
     delwin(win);
+    return ;
 }
+
 void gotoxy(int x, int y) {
     move(y, x);
 }
+
 void gotoxy_putc(int x, int y, int c) {
     move(y, x);
     addch(c);
@@ -35,45 +40,52 @@ void gotoxy_putc(int x, int y, int c) {
     refresh();
 }
 
-void gotoxy_puts(int x, int y, char* s) {
+void gotoxy_puts(int x, int y, char *s) {
     move(y, x);
     addstr(s);
     move(LINES - 1, 1);
     refresh();
 }
+
 void w_gotoxy_putc(WINDOW *win, int x, int y, int c) {
     mvwaddch(win, y, x, c);
     move(LINES - 1, 1);
     wrefresh(win);
+    return ;
 }
+
 void w_gotoxy_puts(WINDOW *win, int x, int y, char *s) {
+    //mvwaddstr(win, y, x, s);
     mvwprintw(win, y, x, s);
     move(LINES - 1, 1);
     wrefresh(win);
+    return ;
 }
+
 void initfootball() {
     initscr();
     clear();
     if (!has_colors() || start_color() == ERR) {
         endwin();
-        fprintf(stderr, "终端不支持颜色!\n");
+        fprintf(stderr, "");
         exit(1);
     }
-    init_pair(1, COLOR_GREEN, COLOR_BLACK); //绿色
-    init_pair(2, COLOR_RED, COLOR_BLACK);//红色
-    init_pair(3, COLOR_WHITE, COLOR_BLACK);//白色
-    init_pair(4, COLOR_YELLOW, COLOR_BLACK);//黄色
-    init_pair(5, COLOR_CYAN, COLOR_BLACK);//青色
-    init_pair(6, COLOR_BLUE, COLOR_BLACK);//蓝色
-    init_pair(7, COLOR_MAGENTA, COLOR_BLACK); //洋红
-    init_pair(8, COLOR_BLACK, COLOR_GREEN);
-    init_pair(9, COLOR_BLACK, COLOR_MAGENTA);
-    init_pair(10, COLOR_BLACK, COLOR_RED);
-    init_pair(11, COLOR_BLACK, COLOR_BLUE);
-    init_pair(12, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+    init_pair(3, COLOR_WHITE, COLOR_BLACK);
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(5, COLOR_CYAN, COLOR_BLACK);
+    init_pair(6, COLOR_BLUE, COLOR_BLACK);
+    init_pair(7, COLOR_BLUE, COLOR_GREEN);
+    init_pair(8, COLOR_BLUE, COLOR_RED);
+    init_pair(9, COLOR_BLUE, COLOR_BLUE);
+    init_pair(10, COLOR_BLUE, COLOR_YELLOW);
+    init_pair(11, COLOR_BLUE, COLOR_WHITE);
+    init_pair(12, COLOR_BLUE, COLOR_CYAN);
+
     Football_t = create_newwin(court.width + 4, court.height + 2, court.start.x - 2, court.start.y - 1);
     Football = subwin(Football_t, court.height, court.width, court.start.x, court.start.y);
-    box(Football, 0, 0);
+	box(Football, 0, 0);
 	wrefresh(Football);
 	WINDOW *Message_t = create_newwin(court.width + 4, 7, court.start.x - 2, court.start.y + court.height + 1);
     Message = subwin(Message_t, 5, court.width + 2, court.start.y + court.height + 2, court.start.x - 1);
@@ -81,8 +93,8 @@ void initfootball() {
 	Help = create_newwin(20, court.height + 2, court.start.x + court.width + 2, court.start.y - 1);
     Score = create_newwin(20, 7, court.start.x + court.width + 2, court.start.y + court.height + 1);
     Write = create_newwin(court.width + 24, 5, court.start.x - 2, court.start.y + court.height + 8);
-
-    for (int i = (2 * court.height / 5); i <= (3 * court.height / 5); i++) {
+	
+	for (int i = (2 * court.height / 5); i <= (3 * court.height / 5); i++) {
 		w_gotoxy_puts(Football_t, 1, i + 1, "x");
 		w_gotoxy_puts(Football_t, court.width + 2, i + 1, "x");
 	}
@@ -90,21 +102,12 @@ void initfootball() {
     return ;
 }
 
-
 void init_help() {
-    /*
-	w_gotoxy_puts(Help, 1, 1, "wasd - 控制上下左右");
-	w_gotoxy_puts(Help, 1, 2, "  j  - 停球");
-	w_gotoxy_puts(Help, 1, 3, "  k  - 踢球");
-	w_gotoxy_puts(Help, 1, 4, "  l  - 带球");
-	w_gotoxy_puts(Help, 1, 5, "空格 - 选择力度");
-    */
     w_gotoxy_puts(Help, 1, 1, "wasd - control");
 	w_gotoxy_puts(Help, 1, 2, "  j  - stop");
 	w_gotoxy_puts(Help, 1, 3, "  k  - kick");
 	w_gotoxy_puts(Help, 1, 4, "  l  - carry");
 	w_gotoxy_puts(Help, 1, 5, "space - strength");
-
 }
 
 void *draw(void *arg) {

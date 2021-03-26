@@ -66,7 +66,7 @@ void show_strength() {
 				make_block(0);
 				break;
 			}
-		} 
+		}
 		usleep(30000);
 		if (loc >= maxx - 2) dir = -1;
 		if (loc <= 2) dir = 1;
@@ -80,5 +80,4 @@ void show_strength() {
 		wrefresh(Write);
 	}
 }
-
 

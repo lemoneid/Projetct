@@ -9,13 +9,16 @@
 #include "datatype.h"
 #include "udp_epoll.h"
 #include "game.h"
+#include "show_data_stream.h"
+
+#define MAX 50
 extern struct User *rteam, *bteam;
 extern int repollfd, bepollfd;
 
 void heart_beat_team(struct User *team) {
 	struct FootBallMsg msg;
-	msg.type = FT_HEART;
-	for (int i = 0; i < MAX_USER; i++) {
+	msg.type = FT_TEST;
+	for (int i = 0; i < MAX; i++) {
 		if (team[i].online) {
 			if (!team[i].flag) {
 				team[i].online = 0;
@@ -35,7 +38,6 @@ void heart_beat_team(struct User *team) {
 		}
 	}
 }
-
 
 void *heart_beat(void *arg) {
 	while (1) {

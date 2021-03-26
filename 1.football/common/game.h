@@ -11,16 +11,16 @@
 #define Show_Message(arg0, arg1, arg2, arg3) show_message(DEFARG(arg0, Message), DEFARG(arg1, NULL), arg2, DEFARG(arg3, 0))
 
 char data_stream[20];
+
 struct Map court;
 WINDOW *Football, *Message, *Help, *Score, *Write, *Football_t;
-
 
 WINDOW *create_newwin(int width, int height, int startx, int starty);
 void destroy_win(WINDOW *win);
 void gotoxy(int x, int y);
 void gotoxy_putc(int x, int y, int c);
-void gotoxy_puts(int x, int y, char* s);
-void w_gotoxy_putc(WINDOW *win, int x, int y, int c); //在窗口上移动
+void gotoxy_puts(int x, int y, char *s);
+void w_gotoxy_putc(WINDOW *win, int x, int y, int c);
 void w_gotoxy_puts(WINDOW *win, int x, int y, char *s);
 void initfootball();
 void *draw(void *arg);

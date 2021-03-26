@@ -7,6 +7,7 @@
 
 #include "head.h"
 #include "game.h"
+
 extern WINDOW *Message;
 extern struct Bpoint ball;
 extern struct BallStatus ball_status;
@@ -21,7 +22,7 @@ int can_access(struct Point *loc) {
 }
 
 int can_kick(struct Point *loc, int strength) {
-    int px = loc->x;
+	int px = loc->x;
 	int py = loc->y;
 
 	if (abs(px - (int)ball.x) <= 2 && abs(py - (int)ball.y) <= 2) {

@@ -9,7 +9,7 @@
 #define _DATATYPE_H
 
 #define MAX_MSG 1024
-#define MAX_USER 50
+#define MAX 50
 #include <pthread.h>
 
 struct Map court;
@@ -61,7 +61,7 @@ struct Speed{
 struct BallStatus {
     struct Speed v;
     struct Aspeed a;
-    int by_team;
+    int who;
     char name[20];
     struct User *user;
     int carry;
@@ -84,15 +84,18 @@ struct Ctl{
 };
 
 //type的值
-#define FT_HEART 0x01 //心跳
-#define FT_ACK 0x02   //ack
-#define FT_MSG 0x04  //私聊，队友之间
-#define FT_WALL 0x08 //公告
-#define FT_CTL 0x10  //控制信息
-#define FT_GAME 0x20 //场地数据
-#define FT_FIN 0x40 //离场
-#define FT_SCORE 0x80 //比分变化
-#define FT_GAMEOVER 0x100 //gameover
+
+#define FT_TEST 0x01 //心跳
+#define FT_WALL 0x02
+#define FT_MSG 0x04
+#define FT_ACK 0x08
+#define FT_FIN 0x10
+#define FT_CTL 0x20 //控制信息
+#define FT_GAME 0x40 //场地数据
+#define FT_SCORE 0x80
+#define FT_GAMEOVER 0x100
+
+
 struct FootBallMsg {
     int type; //l, c,, k, s, n, e
     int size;

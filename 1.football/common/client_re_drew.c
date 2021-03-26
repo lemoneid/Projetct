@@ -7,7 +7,8 @@
 
 #include "head.h"
 #include "game.h"
-#include "cJSON.h"
+#define MAX 50
+
 extern WINDOW *Football, *Football_t, *Score;
 extern struct Bpoint ball;
 extern struct Map court;
@@ -20,7 +21,7 @@ void re_drew_player(cJSON *users) {
 		int team = cJSON_GetObjectItem(user, "team")->valueint;
 		int locx = cJSON_GetObjectItem(user, "locx")->valueint;
 		int locy = cJSON_GetObjectItem(user, "locy")->valueint;
-		
+
 		char p = 'K';
 		wattron(Football, COLOR_PAIR((team ? 6 : 2)));
 		w_gotoxy_putc(Football, locx, locy, p);
@@ -67,4 +68,3 @@ void re_drew(cJSON *root) {
 	wrefresh(Football);
 	wrefresh(Football_t);
 }
-
