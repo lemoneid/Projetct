@@ -8,14 +8,18 @@
 #ifndef _HEAD_H
 #define _HEAD_H
 
-//football
-#include "color.h"
-#include "common.h"
-#include "datatype.h"
-#include "cJSON.h"
-//
-#include <ncurses.h>
+#include <curses.h>
+#include <cjson/cJSON.h>
 #include <locale.h>
+
+#include "./global.h"
+#include "./color.h"
+#include "./common.h"
+#include "./datatype.h"
+#include "./show_data_stream.h"
+#include "./show_strength.h"
+#include "./ball_stop.h"
+
 
 //system
 #include <math.h>
@@ -50,10 +54,5 @@
 #include <sys/select.h>
 #include <sys/time.h>
 
-#ifdef _D
-#define DBG(fmt, args...); printf(fmt, ##args);
-#else
-#define DBG(fmt, args...);
-#endif
 
 #endif

@@ -7,27 +7,28 @@
 
 #include "head.h"
 #include "game.h"
-#define MAX 50
 
+#define MAX 50
 extern WINDOW *Football, *Football_t, *Score;
 extern struct Bpoint ball;
-extern struct Map court;
-extern int rscore, bscore;
+extern struct Score score;
 
 void re_drew_player(cJSON *users) {
-	int user_cnt = cJSON_GetArraySize(users);
+    int user_cnt = cJSON_GetArraySize(users);
 	for (int i = 0; i < user_cnt; i++) {
 		cJSON *user = cJSON_GetArrayItem(users, i);
 		int team = cJSON_GetObjectItem(user, "team")->valueint;
 		int locx = cJSON_GetObjectItem(user, "locx")->valueint;
 		int locy = cJSON_GetObjectItem(user, "locy")->valueint;
-
 		char p = 'K';
-		wattron(Football, COLOR_PAIR((team ? 6 : 2)));
-		w_gotoxy_putc(Football, locx, locy, p);
-		w_gotoxy_puts(Football, locx + 1, locy - 1, cJSON_GetObjectItem(user, "name")->valuestring);
-		wattroff(Football, COLOR_PAIR((team ? 6 : 2)));
-	}
+        if(team) {
+            wattron(Football, COLOR_PAIR(6));
+        } else {
+            wattron(Football, COLOR_PAIR(2));
+        }
+        w_gotoxy_putc(Football, locx, locy, p);
+        w_gotoxy_puts(Football, locx + 1, locy - 1, cJSON_GetObjectItem(user, "name")->valuestring);
+    }
 }
 
 void re_drew_ball(cJSON *c_ball) {
@@ -37,15 +38,21 @@ void re_drew_ball(cJSON *c_ball) {
 }
 
 void re_drew_score(cJSON *c_score) {
-	int bscore = cJSON_GetObjectItem(c_score, "bscore")->valueint;
-	int rscore = cJSON_GetObjectItem(c_score, "rscore")->valueint;
-	w_gotoxy_puts(Score, 1, 1, "BLUE TEAM");
-	w_gotoxy_puts(Score, 11, 1, "RED TEAM");
-	char tmp[10] = {0}, tmp2[10] = {0};
-	sprintf(tmp, "%d", bscore);
-	sprintf(tmp2, "%d", rscore);
-	w_gotoxy_puts(Score, 3, 3, tmp);
-	w_gotoxy_puts(Score, 13, 3, tmp2);
+
+    score.blue = cJSON_GetObjectItem(c_score, "bscore")->valueint;
+	score.red = cJSON_GetObjectItem(c_score, "rscore")->valueint;
+    
+    w_gotoxy_puts(Score, 1, 1, "red blue\n");
+    char tmp[50];
+    sprintf(tmp, "%d:%d", score.red, score.blue);
+    w_gotoxy_puts(Score, 1, 2, tmp);
+}
+
+void ball_door(){
+    for(int i = court.height / 2 - 4; i <= court.height / 2 + 4; i++){
+        w_gotoxy_putc(Football_t, 1, i, 'x');
+        w_gotoxy_putc(Football_t, 117, i, 'x');
+    }
 }
 
 void re_drew(cJSON *root) {
@@ -53,18 +60,14 @@ void re_drew(cJSON *root) {
 	cJSON *c_ball = cJSON_GetObjectItem(root, "ball");
 	cJSON *c_score = cJSON_GetObjectItem(root, "score");
 
-	werase(Football_t);
-	box(Football_t, 0, 0);
-	box(Football, 0, 0);
-	for (int i = (2 * court.height / 5); i <= (3 * court.height / 5); i++) {
-		w_gotoxy_puts(Football_t, 1, i + 1, "x");
-		w_gotoxy_puts(Football_t, court.width + 2, i + 1, "x");
-	}
-
-	re_drew_player(users);
-	re_drew_ball(c_ball);
-	re_drew_score(c_score);
-
-	wrefresh(Football);
-	wrefresh(Football_t);
+    werase(Football);
+    box(Football_t, 0, 0);
+    box(Football, 0, 0);
+    re_drew_player(users);
+    re_drew_ball(c_ball);
+    re_drew_score(c_score);
+    ball_door();
+    wrefresh(Football);
+    wrefresh(Football_t);
 }
+

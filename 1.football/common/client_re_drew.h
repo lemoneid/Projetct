@@ -7,7 +7,9 @@
 
 #ifndef _CLIENT_RE_DREW_H
 #define _CLIENT_RE_DREW_H
-#include "cJSON.h"
-void re_drew(cJSON *root);
 void re_drew_player(cJSON *users);
+void re_drew_ball(cJSON *c_ball);
+void re_drew_score(cJSON *c_score);
+void ball_door();
+void re_drew(cJSON *root);
 #endif

@@ -7,102 +7,100 @@
 
 #ifndef _DATATYPE_H
 #define _DATATYPE_H
-
-#define MAX_MSG 1024
-#define MAX 50
-#include <pthread.h>
-
-struct Map court;
-
-struct Point {
-    int x;
-    int y;
+#define MAXMSG 1024
+struct LogRequest{
+    char name[20];
+    int team;//0 RED 1 BLUE
+    char msg[512];
 };
-struct Bpoint {
+
+struct LogResponse{
+    int type;//0 success 1 failed
+    char msg[512];
+};
+
+struct Point{
+    int x, y;
+};
+
+struct Bpoint{
     double x;
     double y;
 };
-struct User {
-    int team; // 0 RED  1 BLUE
-    int fd; //该玩家对应的连接
-    char name[20];
-    int online;// 1 在线 0 不在线
-    int flag; //未响应次数
-    struct Point loc;
+
+struct User{/*用户*/
+    int team; //0  1
+    char name[20];//name
+    int fd; //存储用户的连接
+    int online;
+    int flag; //未响应的次数
+   // struct sockaddr_in addr;
+    struct Point loc;//position//人的位置
+    int carry;
 };
-//登录相关的
-struct  LogRequest {
-    char name[20];
-    int team;
-    char msg[512];
-};
-struct LogResponse{
-    int type; // 0 OK 1 NO
-    char msg[512];
-};
-struct Map {
+
+struct Map{
     int width;
     int height;
-    struct Point start;
-    int gate_width;
+    struct Point start; /*球场开始的位置*/ // Starting Point
+    int gate_width;  // Goal size
     int gate_height;
 };
-//球加速度
+
+#define ACTION_KICK 0x01
+#define ACTION_CARRY 0x02
+#define ACTION_STOP 0x04
+
+struct Ctrl {
+    //control
+    int action;
+    int kick;
+    int dirx;//方向x
+    int diry;//方向y
+    int strength;
+};
+
+#define FT_TEST 0x01 //服务端心跳信息
+#define FT_WALL 0x02 //服务端以字符串方式广播游戏情况
+#define FT_MSG 0x04 //客户端发送的信息，服务端转发的信息
+#define FT_ACK 0x08 //客户端对心跳ACK确认
+#define FT_FIN 0x10 //客户端，服务端下线前，对彼此的告知
+#define FT_CTL 0x20 //客户端发送的控制信息
+#define FT_GAME 0x40 //服务端向客户端广播的游戏实时图画json发送
+#define FT_SCORE 0x80 //服务端对客户端广播的游戏比分变化,json发送(包括进球人)
+#define FT_GAMEOVER 0x100 //游戏结束
+
+struct FootBallMsg {
+    //登陆后的信息交互
+    int type;
+    int size;
+    int team;//队
+    char name[20];//名字
+    struct Ctrl ctl;
+    char msg[MAXMSG];//信息
+};
+
 struct Aspeed{
-    double x;
-    double y;
+    double x;//x上的加速度
+    double y;//y上的加速度
 };
-//球的速度
+
 struct Speed{
-    double x;
-    double y;
+    double x;//x上的速度
+    double y;//y上的速度
 };
-//球的状态
+
 struct BallStatus {
-    struct Speed v;
-    struct Aspeed a;
-    int who;
-    char name[20];
-    struct User *user;
+    struct Speed v;//速度
+    struct Aspeed a;//加速度
+    int t;//时间
+    int who;//谁
+    char name[20];//名字
     int carry;
-    pthread_mutex_t mutex;
+    //pthread_mutex_t mutex;
 };
 struct Score{
     int red;
     int blue;
 };
-//action value
-#define ACTION_KICK 0x01
-#define ACTION_CARRY 0x02
-#define ACTION_STOP 0x04
-#define ACTION_DFT 0x08
-struct Ctl{
-    int action;
-    int dirx;
-    int diry;
-    int strength;
-};
-
-//type的值
-
-#define FT_TEST 0x01 //心跳
-#define FT_WALL 0x02
-#define FT_MSG 0x04
-#define FT_ACK 0x08
-#define FT_FIN 0x10
-#define FT_CTL 0x20 //控制信息
-#define FT_GAME 0x40 //场地数据
-#define FT_SCORE 0x80
-#define FT_GAMEOVER 0x100
-
-
-struct FootBallMsg {
-    int type; //l, c,, k, s, n, e
-    int size;
-    int team;
-    char name[20];
-    char msg[MAX_MSG];
-    struct Ctl ctl;
-};
-
 #endif

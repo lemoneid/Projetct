@@ -6,6 +6,7 @@
  ************************************************************************/
 #ifndef _COLOR_H_
 #define _COLOR_H_
+
 #define NONE "\e[0m" //清除颜色，即之后的打印为正常输出，之前的不受影响
 #define BLACK "\e[0;30m" //深黑
 #define L_BLACK "\e[1;30m" //亮黑，偏灰褐
@@ -31,5 +32,6 @@
 #define HIDE "\e[8m" //隐藏
 #define CLEAR "\e[2J" //清除
 #define CLRLINE "\r\e[K" //清除行
+
 #endif
 

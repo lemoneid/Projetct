@@ -7,8 +7,5 @@
 
 #ifndef _SHOW_STRENGTH_H
 #define _SHOW_STRENGTH_H
-void stop_ball();
-void kick_ball();
-void carry_ball();
 void show_strength();
 #endif

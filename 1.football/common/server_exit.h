@@ -8,8 +8,8 @@
 #ifndef _SERVER_EXIT_H
 #define _SERVER_EXIT_H
 
+cJSON *game_msg();
 void server_send();
-void score_send(char *name);
 void server_exit(int signum);
 
 #endif
